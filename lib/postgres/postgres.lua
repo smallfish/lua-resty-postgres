@@ -344,7 +344,7 @@ function _M.query(self, query)
             local name  = fields[j]
             local ftype = libpq.PQftype(exec, j-1)
             local val = ffistr(libpq.PQgetvalue(exec, i-1, j-1))
-            if ftype == 23 or ftype == 701 then
+            if ftype == 23 or ftype == 701 then -- TODO: add some type convert
                 val = tonumber(val)
             end
             row[name] = val
@@ -358,7 +358,7 @@ function _M.query(self, query)
 end
 
 function _M.execute(self, query)
-    local db   = self.db
+    local db = self.db
     if db == nil then
         return 0, 'db object not init and connected'
     end
@@ -378,9 +378,10 @@ function _M.execute(self, query)
 end
 
 function _M.close(self)
-    if self.db ~= nil then
+    if self.db then
         libpq.PQfinish(self.db)
     end
+    self.db = nil
 end
 
 return _M
